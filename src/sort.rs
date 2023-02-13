@@ -41,3 +41,19 @@ pub fn shaker_sort(values: &mut Vec<i32>, is_increasing: bool) {
         left += 1;
     }
 }
+
+fn find_number(values: &[i32], boundary: usize, value: i32, is_increasing: bool) -> usize {
+    for (i, n) in values.iter().take(boundary).enumerate() {
+        if (is_increasing && value < *n) || (!is_increasing && value > *n) {
+            return i;
+        }
+    }
+    boundary
+}
+
+pub fn insertion_sort(values: &mut Vec<i32>, is_increasing: bool) {
+    for i in 1..values.len() {
+        values.insert(find_number(values, i, values[i], is_increasing), values[i]);
+        values.remove(i + 1);
+    }
+}
