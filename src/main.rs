@@ -1,11 +1,12 @@
 use rand::Rng;
+use std::cmp::Ordering;
 use std::time::Instant;
 
 mod sort;
 
 fn main() {
     let mut values: Vec<i32> = Vec::new();
-    fill_vector_with_rand_values(&mut values, 1000);
+    fill_vector_with_rand_values(&mut values, 10);
 
     let mut values_for_sort = values.clone();
     sort_array(&mut values_for_sort, &sort::bubble_sort, "Bubble Sort");
@@ -34,15 +35,15 @@ fn fill_vector_with_rand_values(vector: &mut Vec<i32>, count: usize) {
     }
 }
 
-fn sort_array(vector: &mut Vec<i32>, sort_method: &dyn Fn(&mut Vec<i32>, bool), name: &str) {
+fn sort_array(vector: &mut Vec<i32>, sort_method: &dyn Fn(&mut Vec<i32>, Ordering), name: &str) {
     println!("-----------------------------------------------------------------------------------");
-    //println!("Array Before Sorting\n{:?}", &vector);
+    println!("Array Before Sorting\n{:?}", &vector);
     println!("\n{} start...", name);
     let time = Instant::now();
 
-    sort_method(vector, true);
+    sort_method(vector, Ordering::Greater);
 
     println!("{} finish with time {:?}", name, Instant::now() - time);
-    // println!("\nArray After Sorting\n{:?}", &vector);
+    println!("\nArray After Sorting\n{:?}", &vector);
     println!("-----------------------------------------------------------------------------------");
 }
