@@ -1,3 +1,5 @@
+use std::cmp::Ordering;
+
 pub fn bubble_sort(values: &mut Vec<i32>, is_increasing: bool) {
     let mut is_swapped = true;
     while is_swapped {
@@ -55,5 +57,26 @@ pub fn insertion_sort(values: &mut Vec<i32>, is_increasing: bool) {
     for i in 1..values.len() {
         values.insert(find_number(values, i, values[i], is_increasing), values[i]);
         values.remove(i + 1);
+    }
+}
+
+pub fn gnome_sort(values: &mut Vec<i32>, is_increasing: bool) {
+    let mut index = 0;
+
+    let cmp = if is_increasing {
+        Ordering::Greater
+    } else {
+        Ordering::Less
+    };
+
+    while index < values.len() - 1 {
+        if values[index].cmp(&values[index + 1]) == cmp {
+            values.swap(index, index + 1);
+            if index != 0 {
+                index -= 1;
+            }
+        } else {
+            index += 1;
+        }
     }
 }
