@@ -8,39 +8,57 @@ sorting method, and the main function calls it for each sorting method. The code
 long each sorting method takes to complete and prints the results.
 */
 
+use crate::sort::{bubble_sort, gnome_sort, insertion_sort, shaker_sort};
 use rand::Rng;
 use std::cmp::Ordering;
+use std::process;
 use std::time::Instant;
+use structopt::StructOpt;
 
 mod sort;
+
+#[derive(StructOpt, Debug)]
+#[structopt(name = "MP Algs")]
+struct Opt {
+    /// Display data
+    #[structopt(short, long)]
+    verbose: bool,
+
+    /// Sort algorithm (bubble, shaker, insertion, gnome)
+    #[structopt(short, long, default_value = "bubble")]
+    sort: String,
+
+    /// Number of elements
+    #[structopt(short, long, default_value = "10")]
+    count: usize,
+
+    /// Sort order (ascending, descending)
+    #[structopt(short, long, default_value = "ascending")]
+    order: String,
+}
 
 /**
 Main
 
-Main function that generates a vector of 1000 random integers and performs
-four sorting algorithms (`bubble_sort`, `shaker_sort`, `insertion_sort`, `gnome_sort`) on the
-vector using the `sort_array()` function. The results of each sorting algorithm, including the time
-taken for each sorting, are printed to the console.
+Main function generates an array of random numbers of the specified length using the sorting
+algorithm specified in the command line arguments, and then sorts that array.
 **/
 fn main() {
+    let opt = Opt::from_args();
+
     let mut values: Vec<i32> = Vec::new();
-    fill_vector_with_rand_values(&mut values, 1000);
+    fill_vector_with_rand_values(&mut values, opt.count);
 
-    let mut values_for_sort = values.clone();
-    sort_array(&mut values_for_sort, &sort::bubble_sort, "Bubble Sort");
+    let order = match opt.order.as_str() {
+        "ascending" => Ordering::Greater,
+        "descending" => Ordering::Less,
+        _ => {
+            println!("Error: \"{}\" is incorrect ordering", opt.order);
+            process::exit(1);
+        }
+    };
 
-    let mut values_for_sort = values.clone();
-    sort_array(&mut values_for_sort, &sort::shaker_sort, "Shaker Sort");
-
-    let mut values_for_sort = values.clone();
-    sort_array(
-        &mut values_for_sort,
-        &sort::insertion_sort,
-        "Insertion Sort",
-    );
-
-    let mut values_for_sort = values.clone();
-    sort_array(&mut values_for_sort, &sort::gnome_sort, "Gnome Sort");
+    sort(&mut values.clone(), &opt.sort, opt.verbose, order);
 }
 
 /**
@@ -68,25 +86,39 @@ fn fill_vector_with_rand_values(vector: &mut Vec<i32>, count: usize) {
 }
 
 /**
-Sort array
+Sort the array
 
-The function takes a mutable reference to a vector of i32 values, a reference to a
-function that implements a sorting algorithm on the vector, and a string that identifies the
-sorting algorithm. The function then prints a header message to the console, indicating that the
-sort is starting, and measures the time taken to perform the sort by calling Instant::now(). It
-then applies the sorting algorithm by calling the function passed as a reference, and printing a
-message indicating the sort is complete along with the elapsed time. Finally, it prints another
-header message.
+This function takes a mutable reference to a vector of i32 elements to
+sort, a string indicating the sorting algorithm to use, a boolean value indicating verbose output,
+and an Ordering value indicating the sort order. The function prints the array before sorting if
+verbose is enabled and then sorts the array using the specified algorithm. After the sort is
+complete, the function prints the sorting time and the array after sorting if verbose is enabled.
+If the specified sorting algorithm is not recognized, an error message is printed, and the program
+is terminated.
 **/
-fn sort_array(vector: &mut Vec<i32>, sort_method: &dyn Fn(&mut Vec<i32>, Ordering), name: &str) {
-    println!("-----------------------------------------------------------------------------------");
-    //println!("Array Before Sorting\n{:?}", &vector);
-    println!("\n{} start...", name);
+fn sort(vector: &mut Vec<i32>, sort: &str, verbose: bool, order: Ordering) {
+    if verbose {
+        println!("Array Before Sorting\n{:?}", &vector);
+    }
+    println!("\n{} sort start...", sort);
     let time = Instant::now();
 
-    sort_method(vector, Ordering::Greater);
+    match sort {
+        "bubble" => bubble_sort(vector, order),
+        "shaker" => shaker_sort(vector, order),
+        "insertion" => insertion_sort(vector, order),
+        "gnome" => gnome_sort(vector, order),
+        _ => {
+            println!(
+                "Error: \"{}\" sort algorithm is not implemented or not exists.",
+                sort
+            );
+            process::exit(1);
+        }
+    }
 
-    println!("{} finish with time {:?}", name, Instant::now() - time);
-    //println!("\nArray After Sorting\n{:?}", &vector);
-    println!("-----------------------------------------------------------------------------------");
+    println!("{} sort finish with time {:?}", sort, Instant::now() - time);
+    if verbose {
+        println!("\nArray After Sorting\n{:?}", &vector);
+    }
 }
