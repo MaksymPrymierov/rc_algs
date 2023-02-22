@@ -108,9 +108,7 @@ pub fn gnome_sort(values: &mut Vec<i32>, order: Ordering) {
     while index < values.len() - 1 {
         if values[index].cmp(&values[index + 1]) == order {
             values.swap(index, index + 1);
-            if index != 0 {
-                index -= 1;
-            }
+            index = index.saturating_sub(1);
         } else {
             index += 1;
         }
