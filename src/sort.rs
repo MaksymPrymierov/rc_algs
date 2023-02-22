@@ -116,3 +116,41 @@ pub fn gnome_sort(values: &mut Vec<i32>, order: Ordering) {
         }
     }
 }
+
+pub fn merge_sort(values: &mut [i32], order: Ordering) {
+    let mid = values.len() / 2;
+
+    match values.len() {
+        n if n > 3 => {
+            merge_sort(&mut values[..mid], order);
+            merge_sort(&mut values[mid..], order);
+
+            let mut index = 0;
+            while index < mid {
+                let min = find_number(values, mid + index, values[mid + index], order);
+                if min < mid + index {
+                    values.swap(min, mid + index);
+                } else {
+                    index += 1;
+                }
+            }
+        }
+        3 => {
+            if values[0].cmp(&values[1]) == order {
+                values.swap(0, 1);
+            }
+            if values[1].cmp(&values[2]) == order {
+                values.swap(1, 2);
+            }
+            if values[0].cmp(&values[1]) == order {
+                values.swap(0, 1);
+            }
+        }
+        2 => {
+            if values[0].cmp(&values[1]) == order {
+                values.swap(0, 1);
+            }
+        }
+        _ => {}
+    }
+}

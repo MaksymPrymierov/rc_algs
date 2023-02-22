@@ -8,7 +8,7 @@ sorting method, and the main function calls it for each sorting method. The code
 long each sorting method takes to complete and prints the results.
 */
 
-use crate::sort::{bubble_sort, gnome_sort, insertion_sort, shaker_sort};
+use crate::sort::{bubble_sort, gnome_sort, insertion_sort, merge_sort, shaker_sort};
 use rand::Rng;
 use std::cmp::Ordering;
 use std::process;
@@ -24,7 +24,7 @@ struct Opt {
     #[structopt(short, long)]
     verbose: bool,
 
-    /// Sort algorithm (bubble, shaker, insertion, gnome)
+    /// Sort algorithm (bubble, shaker, insertion, gnome, merge)
     #[structopt(short, long, default_value = "bubble")]
     sort: String,
 
@@ -108,6 +108,7 @@ fn sort(vector: &mut Vec<i32>, sort: &str, verbose: bool, order: Ordering) {
         "shaker" => shaker_sort(vector, order),
         "insertion" => insertion_sort(vector, order),
         "gnome" => gnome_sort(vector, order),
+        "merge" => merge_sort(vector, order),
         _ => {
             println!(
                 "Error: \"{}\" sort algorithm is not implemented or not exists.",
